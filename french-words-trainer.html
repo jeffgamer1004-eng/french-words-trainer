@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>French Word Trainer</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 80px 20px;
+    background: #fff;
+  }
+  #french-word {
+    font-size: 72px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000;
+  }
+  #english-translation {
+    font-size: 36px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div id="french-word">Loading...</div>
+<div id="english-translation"></div>
+
+<script>
+const words = [
+  { french: "bonjour", english: "hello" },
+  { french: "merci", english: "thank you" },
+  { french: "chat", english: "cat" },
+  { french: "chien", english: "dog" },
+  { french: "maison", english: "house" },
+  { french: "fromage", english: "cheese" },
+  { french: "livre", english: "book" },
+  { french: "pomme", english: "apple" },
+  { french: "école", english: "school" },
+  { french: "amour", english: "love" },
+  { french: "soleil", english: "sun" },
+  { french: "lune", english: "moon" },
+  { french: "fleur", english: "flower" },
+  { french: "voiture", english: "car" },
+  { french: "eau", english: "water" },
+  { french: "pain", english: "bread" },
+  { french: "porte", english: "door" },
+  { french: "oiseau", english: "bird" },
+  { french: "mer", english: "sea" },
+  { french: "montagne", english: "mountain" },
+  { french: "ville", english: "city" },
+  { french: "ami", english: "friend" },
+  { french: "jour", english: "day" },
+  { french: "nuit", english: "night" },
+  { french: "temps", english: "time" },
+  { french: "froid", english: "cold" },
+  { french: "chaud", english: "hot" },
+  { french: "faim", english: "hunger" },
+  { french: "soif", english: "thirst" },
+  { french: "travail", english: "work" },
+  { french: "argent", english: "money" },
+  { french: "famille", english: "family" },
+  { french: "rêve", english: "dream" },
+  { french: "musique", english: "music" },
+  { french: "cinéma", english: "cinema" },
+  { french: "étoile", english: "star" },
+  { french: "mercredi", english: "Wednesday" },
+  { french: "jeudi", english: "Thursday" },
+  { french: "vendredi", english: "Friday" },
+  { french: "samedi", english: "Saturday" },
+  { french: "dimanche", english: "Sunday" },
+  { french: "manger", english: "eat" },
+  { french: "boire", english: "drink" },
+  { french: "parler", english: "talk" },
+  { french: "écouter", english: "listen" },
+  { french: "regarder", english: "watch" },
+  { french: "courir", english: "run" },
+  { french: "marcher", english: "walk" },
+  { french: "jouer", english: "play" },
+  { french: "chanter", english: "sing" },
+  { french: "danser", english: "dance" },
+  { french: "écrire", english: "write" },
+  { french: "lire", english: "read" },
+  { french: "apprendre", english: "learn" },
+  { french: "comprendre", english: "understand" },
+  { french: "travailler", english: "work" },
+  { french: "jouet", english: "toy" },
+  { french: "arbre", english: "tree" },
+  { french: "table", english: "table" },
+  { french: "chaise", english: "chair" },
+  { french: "lit", english: "bed" },
+  { french: "fenêtre", english: "window" },
+  { french: "mur", english: "wall" },
+  { french: "ciel", english: "sky" },
+  { french: "terre", english: "earth" },
+  { french: "feu", english: "fire" },
+  { french: "neige", english: "snow" },
+  { french: "vent", english: "wind" },
+  { french: "pluie", english: "rain" },
+  { french: "nuage", english: "cloud" },
+  { french: "rire", english: "laugh" },
+  { french: "pleurer", english: "cry" },
+  { french: "bonheur", english: "happiness" },
+  { french: "tristesse", english: "sadness" },
+  { french: "paix", english: "peace" },
+  { french: "guerre", english: "war" },
+  { french: "espoir", english: "hope" },
+  { french: "souvenir", english: "memory" },
+  { french: "voisin", english: "neighbor" },
+  { french: "université", english: "university" },
+  { french: "professeur", english: "teacher" },
+  { french: "étudiant", english: "student" },
+  { french: "question", english: "question" },
+  { french: "réponse", english: "answer" },
+  { french: "problème", english: "problem" },
+  { french: "solution", english: "solution" },
+  { french: "idée", english: "idea" },
+  { french: "créativité", english: "creativity" },
+  { french: "imagination", english: "imagination" },
+  { french: "voyage", english: "travel" },
+  { french: "avion", english: "plane" },
+  { french: "train", english: "train" },
+  { french: "bateau", english: "boat" },
+  { french: "vélo", english: "bike" }
+];
+
+const wordDisplayTime = 60 * 1000; // 1 minute
+const repeatInterval = 5 * 1000;   // 5 seconds
+
+const frenchDiv = document.getElementById("french-word");
+const englishDiv = document.getElementById("english-translation");
+
+let currentIndex = 0;
+let repeatTimer;
+
+function speak(text) {
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    speechSynthesis.speak(utterance);
+  }
+}
+
+function showWord() {
+  if (currentIndex >= words.length) {
+    frenchDiv.textContent = "Fini!";
+    englishDiv.textContent = "";
+    return;
+  }
+
+  const currentWord = words[currentIndex];
+  frenchDiv.textContent = currentWord.french;
+  englishDiv.textContent = currentWord.english;
+
+  speak(currentWord.french);
+
+  repeatTimer = setInterval(() => {
+    speak(currentWord.french);
+  }, repeatInterval);
+
+  setTimeout(() => {
+    clearInterval(repeatTimer);
+    currentIndex++;
+    showWord();
+  }, wordDisplayTime);
+}
+
+showWord();
+</script>
+
+</body>
+</html>
